@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_ROOT: "Ecommerce"
+  DOTNET_ROOT: 'Ecommerce'
   
 jobs:
   build:
