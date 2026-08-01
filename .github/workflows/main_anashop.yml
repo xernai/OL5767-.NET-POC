@@ -63,5 +63,5 @@ jobs:
         with:
           app-name: 'anashop'
           slot-name: 'Production'
-          package: ${{ github.workspace }}/${{ env.PROJECT_DIR }}/${{ env.BUILD_ARTIFACT }}
+          package: ${{ github.workspace }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AB528F61FD0943FA83F42BA9CEE17FD3 }}
