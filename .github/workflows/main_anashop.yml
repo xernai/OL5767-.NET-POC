@@ -53,7 +53,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+          path: ${{ github.workspace }}/.net-app
+
       - name: List workspace (debug)
         run: dir /s
 
@@ -63,5 +64,5 @@ jobs:
         with:
           app-name: 'anashop'
           slot-name: 'Production'
-          package: ${{ github.workspace }}
+          package: ${{ github.workspace }}/.net-app
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AB528F61FD0943FA83F42BA9CEE17FD3 }}
