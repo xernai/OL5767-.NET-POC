@@ -10,13 +10,14 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_ROOT: 'Ecommerce'
-  
+  PROJECT_DIR: 'Ecommerce'     # folder that contains your .sln / .csproj
+  BUILD_ARTIFACT: 'myapp'      # relative publish output folder name
+
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read # This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -26,33 +27,41 @@ jobs:
         with:
           dotnet-version: '10.x'
 
+      - name: Show repo layout (debug)
+        run: dir
+
       - name: Build with dotnet
+        working-directory: ${{ env.PROJECT_DIR }}
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: dotnet publish -c Release -o "${{ github.workspace }}/${{ env.PROJECT_DIR }}/${{ env.BUILD_ARTIFACT }}"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ github.workspace }}/${{ env.PROJECT_DIR }}/${{ env.BUILD_ARTIFACT }}
 
   deploy:
     runs-on: windows-latest
     needs: build
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
+      - name: List workspace (debug)
+        run: dir /s
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'anashop'
           slot-name: 'Production'
-          package: .
+          package: ${{ github.workspace }}/${{ env.PROJECT_DIR }}/${{ env.BUILD_ARTIFACT }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AB528F61FD0943FA83F42BA9CEE17FD3 }}
